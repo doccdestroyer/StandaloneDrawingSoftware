@@ -41,6 +41,7 @@ BucketTool::BucketTool(UIManager* ui, QWidget* parent)
     connect(layerManager, &LayerManager::layerSelected,
         this, [=](const QString& layerName, int layerIndex) {
             selectedLayerIndex = layerIndex;
+            update();
         });
 
 
@@ -82,17 +83,23 @@ void BucketTool::resetZoom()
 
 void BucketTool::undo()
 {
+    // Undo from manager and update local variables accordingly
     uiManager->undoManager->undo();
     layers = layerManager->layers;
+    overlay = layerManager->selectionOverlay;
+    selectionsPath = layerManager->selectionsPath;
+
+    layerManager->update();
     update();
 }
 
 void BucketTool::redo()
 {
+    // Redo from manager and update local variables accordingly
     uiManager->undoManager->redo();
     layers = layerManager->layers;
-    selectionsPath = uiManager->undoManager->selectionsPath;
-    overlay = uiManager->undoManager->selectionOverlay;
+    overlay = layerManager->selectionOverlay;
+    selectionsPath = layerManager->selectionsPath;
     update();
 }
 void BucketTool::keyPressEvent(QKeyEvent* event)
@@ -135,10 +142,8 @@ void BucketTool::keyPressEvent(QKeyEvent* event)
     }
 }
 
-
 void BucketTool::keyReleaseEvent(QKeyEvent* event)
 {
-
     if (event->isAutoRepeat())
     {
         return;
@@ -159,6 +164,7 @@ void BucketTool::paintEvent(QPaintEvent* event)
     QPainter painter(this);
     QPoint center = rect().center();
 
+    // Translate based on zoom and pan offset
     painter.translate(center);
     painter.scale(zoomPercentage / 100, zoomPercentage / 100);
     painter.translate(panOffset / (zoomPercentage / 100.0));
@@ -168,11 +174,14 @@ void BucketTool::paintEvent(QPaintEvent* event)
 
     QPointF topLeft(-image.width() / 2.0, -image.height() / 2.0);
 
+    // Draw background
     painter.drawImage(topLeft, pngBackground);
 
+    // Draw Layers
     for (const QImage layer : layers) {
         painter.drawImage(topLeft, layer);
     }
+    // Draw Selection
     painter.drawImage(topLeft, overlay);
 }
 
@@ -180,7 +189,6 @@ void BucketTool::paintEvent(QPaintEvent* event)
 QPoint BucketTool::mapToImage(const QPoint& p)
 {
     QPoint center = rect().center();
-    qDebug() << center;
     QPoint offsetPoint = (p - center - panOffset) / (zoomPercentage / 100.0);
     return offsetPoint + QPoint(image.width() / 2.0, image.height() / 2.0);
 }
@@ -213,13 +221,13 @@ void BucketTool::mousePressEvent(QMouseEvent* event)
                 QPainterPath imagePath;
                 imagePath.addPolygon(imagePolygon);
 
+                // Merge selection paths to get a clip path for the bucket
                 bool changed = false;
                 for (int i = 0; i < selectionsPath.length(); ++i)
                 {
 
                     QPainterPath& path = newPath[i];
                     QPainterPath subtractionPath = imagePath.subtracted(path);
-                    //newPath[i] = subtractionPath;
 
                     newPath[i] = (subtractionPath != path) ? subtractionPath : path;
                     changed = (subtractionPath != path);
@@ -244,29 +252,25 @@ void BucketTool::mousePressEvent(QMouseEvent* event)
                 }
                 QPainterPath clipPath = imagePath.subtracted(newPath[0]);
 
-                if (clipPath.contains(point))
+                if (clipPath.contains(point)) // If path contains ppoint, fill and update layer, else, do nothing
                 {
-                    qDebug() << "path contained";
                     QImage currentImage = layers[selectedLayerIndex];
-
                     QColor basePixelColor = QColor(currentImage.pixel(point.x(), point.y()));
-
 
                     layers[selectedLayerIndex] = fill(currentImage, point.x(), point.y(), basePixelColor, colour);
 
                 }
             }
-            else
+            else // if no selection, fill and update layer
             {
                 QImage currentImage = layers[selectedLayerIndex];
-
                 QColor basePixelColor = QColor(currentImage.pixel(point.x(), point.y()));
-
                 layers[selectedLayerIndex] = fill(currentImage, point.x(), point.y(), basePixelColor, colour);
             }
 
         }
     }
+    // Update local and shared variables
     layerManager->layers[selectedLayerIndex] = layers[selectedLayerIndex];
     layerManager->layers = layers;
     layerManager->update();
@@ -306,37 +310,44 @@ QImage BucketTool::fill(QImage& image, int startX, int startY,
     const QRgb target = image.pixel(startX, startY);
     const QRgb replacement = newColor.rgba();
 
+    // If pixel is the colour, return
     if (target == replacement)
         return image;
 
     QStack<QPoint> stack;
     stack.push(QPoint(startX, startY));
 
+    // While there are pixels to be completed
     while (!stack.isEmpty())
     {
         QPoint p = stack.pop();
         int x = p.x();
         int y = p.y();
 
+        // Break if pixel value exceeds image dimenstions
         if (x < 0 || x >= image.width() ||
             y < 0 || y >= image.height())
         {
             continue;
         }
 
+        // Break if pixel is starting pixel
         if (image.pixel(x, y) != target)
         {
             continue;
         }
 
+        // If selections, check if point currently being questioned is in the selection
         if (selectionsPath.length() > 0)
         {
             for (int pathNum = 0; pathNum < selectionsPath.count(); pathNum++)
             {
                 if (selectionsPath[pathNum].contains(QPoint(x, y)))
                 {
+                    // Change pixel colour
                     image.setPixel(x, y, replacement);
 
+                    // Expand points
                     stack.push(QPoint(x + 1, y));
                     stack.push(QPoint(x - 1, y));
                     stack.push(QPoint(x, y + 1));
@@ -346,8 +357,10 @@ QImage BucketTool::fill(QImage& image, int startX, int startY,
         }
         else
         {
+            // Change pixel colour
             image.setPixel(x, y, replacement);
 
+            // Expand points
             stack.push(QPoint(x + 1, y));
             stack.push(QPoint(x - 1, y));
             stack.push(QPoint(x, y + 1));
@@ -357,5 +370,3 @@ QImage BucketTool::fill(QImage& image, int startX, int startY,
     }
     return image;
 }
-
-

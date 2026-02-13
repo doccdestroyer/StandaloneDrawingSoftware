@@ -68,6 +68,7 @@ void EllipticalSelectionTool::applyZoom(float zoomAmount)
 
 void EllipticalSelectionTool::undo()
 {
+    // Undo from manager and update local variables accordingly
     uiManager->undoManager->undo();
     layers = layerManager->layers;
     overlay = layerManager->selectionOverlay;
@@ -77,6 +78,7 @@ void EllipticalSelectionTool::undo()
 
 void EllipticalSelectionTool::redo()
 {
+    // Redo from manager and update local variables accordingly
     uiManager->undoManager->redo();
     layers = layerManager->layers;
     overlay = layerManager->selectionOverlay;
@@ -155,6 +157,7 @@ void EllipticalSelectionTool::mousePressEvent(QMouseEvent* event)
 
             else
             {
+                // Restart/Start new Selection
                 makingAdditionalSelection = false;
                 makingRemoval = false;
                 selectionsPath.clear();
@@ -223,10 +226,12 @@ void EllipticalSelectionTool::mouseReleaseEvent(QMouseEvent* event)
             if (isDrawingSquare)
             {
                 isDrawingSquare = false;
+                // Find smallest axis difference from start point
                 xDifference = (releasePoint.x() - startPoint.x());
                 yDifference = (releasePoint.y() - startPoint.y());
                 float variance = std::min(abs(xDifference), abs(yDifference));
 
+                // Calculate if direction is positive or negative for each axis
                 int directionX;
                 int directionY;
                 if (xDifference < 0)
@@ -279,12 +284,10 @@ void EllipticalSelectionTool::mouseReleaseEvent(QMouseEvent* event)
             QPainterPath newPath;
             newPath.addPolygon(newPolygonF);
 
-
+            // Removal logic
             if (makingRemoval)
             {
                 bool removedFromMerge = false;
-
-
                 for (int i = 0; i < selectionsPath.length(); ++i)
                 {
                     QPainterPath& path = selectionsPath[i];
@@ -320,6 +323,7 @@ void EllipticalSelectionTool::mouseReleaseEvent(QMouseEvent* event)
                 }
 
             }
+            // Additional selection lgoic
             else if (makingAdditionalSelection)
             {
                 bool mergedAnyPolygons = false;
@@ -370,7 +374,7 @@ void EllipticalSelectionTool::mouseReleaseEvent(QMouseEvent* event)
         }
 
     }
-
+    // Update shared and local variables
     clearSelectionOverlay();
     updateSelectionOverlay();
     update();
@@ -402,6 +406,7 @@ void EllipticalSelectionTool::paintEvent(QPaintEvent* event)
     QPainter painter(this);
     QPoint center = rect().center();
 
+    // Translate based on zoom and pan offset
     painter.translate(center);
     painter.scale(zoomPercentage / 100, zoomPercentage / 100);
     painter.translate(panOffset / (zoomPercentage / 100.0));
@@ -410,13 +415,15 @@ void EllipticalSelectionTool::paintEvent(QPaintEvent* event)
     painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
     QPointF topLeft(-image.width() / 2.0, -image.height() / 2.0);
-    painter.fillRect(rect(), Qt::black);
 
+    // Draw background
     painter.drawImage(topLeft, pngBackground);
 
+    // Draw Layers
     for (const QImage layer : layers) {
         painter.drawImage(topLeft, layer);
     }
+    // Draw Selection
     painter.drawImage(topLeft, overlay);
 }
 
@@ -428,7 +435,7 @@ void EllipticalSelectionTool::clearSelectionOverlay()
 
 void EllipticalSelectionTool::updateSelectionOverlay()
 {
-
+    // Same logic as paint event but for selection overlay, TO BE CHANGED INTO FUNCTIONS AT A LATER DATE
     overlay.fill(Qt::transparent);
     QPainter painter(&overlay);
     painter.setRenderHint(QPainter::Antialiasing);
@@ -446,6 +453,7 @@ void EllipticalSelectionTool::updateSelectionOverlay()
     painter.setPen(outlinePen);
     painter.setBrush(fillBrush);
 
+    // Draw all selecitons
     for (const QPainterPath& path : selectionsPath) {
         QVector<QPolygonF> allPolys = path.toFillPolygons();
         for (const QPolygonF& polyF : allPolys) {

@@ -26,6 +26,7 @@ MainWindow::MainWindow()
 
     createDockWindows();
 
+    ///////////////////////////////////        MenuBar Signals     /////////////////////////////////
     connect(menuBar, &MenuBar::undoPressed,
         this, [&]()
         {
@@ -63,8 +64,10 @@ MainWindow::MainWindow()
         {
             expandSelections();
         });
+    ////////////////////////////////////////////////////////////////////////////////////////////
 
 
+    ///////////////////////////////////   Brush Menu Signals   /////////////////////////////////
     connect(brushControlsWindow, &BrushControlsWindow::chalkEnabled,
         this, [&]()
         {
@@ -123,7 +126,6 @@ MainWindow::MainWindow()
             brushTool->tiltEnabled = false;
         });
 
-
     connect(brushControlsWindow, &BrushControlsWindow::penPressureSizeOn,
         this, [&]()
         {
@@ -171,13 +173,16 @@ MainWindow::MainWindow()
                 brushTool->spacing = 0;
             }
         });
+    ////////////////////////////////////////////////////////////////////////////////////////////
 
+
+
+    ///////////////////////////////////       Brush Signals    /////////////////////////////////
     connect(brushTool, &BrushTool::brushDisabled,
         this, [&]()
         {
             disableBrushTool();
         });
-
     connect(lassoTool, &LassoTool::lassoDisabled,
         this, [&]()
         {
@@ -194,9 +199,6 @@ MainWindow::MainWindow()
             disablePolygonalLassoTool();
         });
 
-
-
-
     connect(brushTool, &BrushTool::lassoEnabled,
         this, [&]()
         {
@@ -212,9 +214,11 @@ MainWindow::MainWindow()
         {
             enableBrushTool();
         });
+    ////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
+    ///////////////////////////////////   Tool Menu Signals    /////////////////////////////////
     connect(toolSelectionMenu, &ToolSelectionMenu::brushEnabled,
         this, [&]()
         {
@@ -288,9 +292,11 @@ MainWindow::MainWindow()
             disableEraser();
         });
 }
+////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
+// Disable Tools and update shared Variables
 void MainWindow::disablePolygonalLassoTool()
 {
     polygonalLassoTool->points.clear();
@@ -363,7 +369,7 @@ void MainWindow::disableEraser()
 
 
 
-
+// Enable Tools and update local Variables
 void MainWindow::enableLassoTool()
 {
     dock->setWidget(lassoTool);
@@ -434,6 +440,7 @@ void MainWindow::enableEraser()
     brushTool->isErasing = true;
 }
 
+// Create main window in docks
 void MainWindow::createDockWindows()
 {
     TopDock = new QDockWidget(this);
@@ -460,13 +467,14 @@ void MainWindow::createDockWindows()
     ToolDock->setWidget(toolSelectionMenu);
     addDockWidget(Qt::LeftDockWidgetArea, ToolDock);
 
-    dock = new QDockWidget(tr("WindowFileName"), this);
+    dock = new QDockWidget(tr("Masterpiece"), this);
     dock->setWidget(brushTool);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
 
     splitDockWidget(ToolDock, dock, Qt::Horizontal);
 }
 
+// Modify the scale of selections for each poly in the path
 void MainWindow::alterSelectionsScale(float scaleFactor)
 {
     QVector<QPainterPath> newSelectionPath = { QPainterPath() };
@@ -508,6 +516,9 @@ void MainWindow::expandSelections()
 {
     alterSelectionsScale(10.0 / 9.0);
 }
+
+
+/// MASS TOOLS CONTROLS ///
 
 void MainWindow::toolSpecificUndo()
 {
@@ -644,7 +655,6 @@ void MainWindow::updateAllTools()
 
 void MainWindow::clearOverlay()
 {
-
     if (toolSelectionMenu->selectedTool == "Lasso")
     {
         lassoTool->selectionsPath.clear();
@@ -669,7 +679,6 @@ void MainWindow::clearOverlay()
 
 void MainWindow::updateOverlay()
 {
-
     if (toolSelectionMenu->selectedTool == "Lasso")
     {
         lassoTool->updateSelectionOverlay();

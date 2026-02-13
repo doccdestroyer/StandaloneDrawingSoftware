@@ -43,6 +43,7 @@ BrushTool::BrushTool(UIManager* ui, QWidget* parent)
     connect(layerManager, &LayerManager::layerAdded,
         this, [=](int layerIndex) {
 
+            // Add layer to layers (shared variable) and update local variables accoridingly
 
             layers.insert(layerIndex, originalImage);
             selectedLayerIndex = layerIndex;
@@ -66,6 +67,7 @@ BrushTool::BrushTool(UIManager* ui, QWidget* parent)
 
     connect(layerManager, &LayerManager::layerDeleted,
         this, [=](int layerIndex) {
+            // Delete layer from layers (shared variable) and update local variables accoridingly
             if (layerIndex < 0 || layerIndex >= layers.size()) {
                 return;
             }
@@ -126,7 +128,7 @@ void BrushTool::tabletEvent(QTabletEvent* event)
         }
         else if (drawing)
         {
-            if (layers.count() < 1) return;
+            if (layers.count() < 1) return; // If there are no layers, do not draw
 
             currentPoint = mapToImageF(getScaledPointF(event->position()));
             qreal pressure = event->pressure();
@@ -142,7 +144,6 @@ void BrushTool::tabletEvent(QTabletEvent* event)
                 yTilt = 0;
             }
 
-
             QPainter painter(&layers[selectedLayerIndex]);
 
             painter.setRenderHint(QPainter::Antialiasing, true);
@@ -155,6 +156,7 @@ void BrushTool::tabletEvent(QTabletEvent* event)
 
             hoverPoint = event->position();
             isHovering = true;
+            // Delay on hover to keep lag minimal
             delayCounter += 1;
             if (delayCounter == 5) {
                 delayCounter = 0;
@@ -163,6 +165,17 @@ void BrushTool::tabletEvent(QTabletEvent* event)
             }
         }
         else {
+            if (tiltEnabled)
+            {
+                xTilt = event->xTilt();
+                yTilt = event->yTilt();
+            }
+            else
+            {
+                xTilt = 0;
+                yTilt = 0;
+            }
+            // Delay on hover to keep lag minimal
             hoverPoint = event->position();
             isHovering = true;
             delayCounter += 1;
@@ -184,13 +197,13 @@ void BrushTool::tabletEvent(QTabletEvent* event)
         lastPointF = currentPoint;
         drawing = false;
         usingTablet = true;
-        //pushUndo(layers);
+
+        // push Undo
 
         uiManager->undoManager->pushUndo(layers);
         layerManager->layers = layers;
         layerManager->pushUndo();
         uiManager->undoManager->selectionOverlay = overlay;
-        //uiManager->undoManager->pushUndo(layers);
         uiManager->undoManager->selectionsPath = selectionsPath;
 
         uiManager->undoManager->redoSelectionStack.clear();
@@ -208,6 +221,7 @@ void BrushTool::undo()
     uiManager->undoManager->undo();
     layers = layerManager->layers;
 
+    // Update selected layer if applicable
     if (selectedLayerIndex >= layerManager->layers.count())
     {
         selectedLayerIndex -= 1;
@@ -301,14 +315,13 @@ void BrushTool::keyReleaseEvent(QKeyEvent* event)
 }
 void BrushTool::applyZoom(float zoomAmount)
 {
-
+    // Bounds for zoom percentage
     if (1 <= zoomPercentage * zoomAmount <= 12800)
     {
         zoomPercentage = zoomPercentage * zoomAmount;
     }
     else if (zoomPercentage < 1) { zoomPercentage = 1; }
     else { zoomPercentage = 12800; }
-    repaint();
     update();
 }
 
@@ -377,14 +390,13 @@ void BrushTool::mousePressEvent(QMouseEvent* event)
             drawing = true;
             brush = adjustBrushColour(brush, colour);
         }
-
     }
 }
 
 void BrushTool::mouseMoveEvent(QMouseEvent* event)
 {
 
-    if (usingTablet == true) return;
+    if (usingTablet == true) return; // Do not register mouse if using tablet
     if (layers.count() < 1) return;
     if (isPanning)
     {
@@ -434,6 +446,7 @@ void BrushTool::mouseReleaseEvent(QMouseEvent* event)
     if (event->button() == Qt::LeftButton) {
         drawing = false;
 
+        // Push Undo
         uiManager->undoManager->pushUndo(layers);
         layerManager->layers = layers;
         layerManager->pushUndo();
@@ -458,6 +471,7 @@ void BrushTool::paintEvent(QPaintEvent* event)
     QPoint center = rect().center();
     QPoint hoverOffset = center - hoverPoint.toPoint();
 
+    // Translate based on zoom and pan offset
     painter.translate(center);
     painter.scale(zoomPercentage / 100, zoomPercentage / 100);
     painter.translate(panOffset / (zoomPercentage / 100.0));
@@ -467,17 +481,19 @@ void BrushTool::paintEvent(QPaintEvent* event)
 
     QPointF topLeft(-image.width() / 2.0, -image.height() / 2.0);
 
+    // Draw background
     painter.drawImage(topLeft, pngBackground);
 
+    // Draw Layers
     for (const QImage layer : layers) {
         painter.drawImage(topLeft, layer);
     }
+    // Draw Selection
     painter.drawImage(topLeft, overlay);
 
+    // Undo scale ranslate and offset
     painter.scale(100 / zoomPercentage, 100 / zoomPercentage);
-
     painter.translate(-center);
-
 
     if (isErasing) {
         painter.setCompositionMode(QPainter::CompositionMode_Clear);
@@ -508,8 +524,8 @@ void BrushTool::paintEvent(QPaintEvent* event)
 
 void BrushTool::removeLayer(int layer)
 {
+    // Remove selected layer -> get layer back to possible bounds and if possible go to the layer below
     selectedLayerIndex -= 1;
-
     if (selectedLayerIndex == layer)
     {
         selectedLayerIndex = qMax(0, selectedLayerIndex - 1);
@@ -540,14 +556,15 @@ void BrushTool::drawStroke(QPainter& p, const QPointF& from, const QPointF& to, 
     QLineF line(from, to);
     qreal dist = line.length();
 
-    //if (dist > 2.5 && spacing < 2.5) {
-    //    QPointF quaterPoint = lastPointF + QPointF((lastPointF.x() - currentPoint.x()) / 4, (lastPointF.y() - currentPoint.y()) / 4);
-    //    drawBrush(p, quaterPoint, pressure);
-    //    QPointF midPoint = lastPointF + QPointF((lastPointF.x() - currentPoint.x()) / 2, (lastPointF.y() - currentPoint.y()) / 2);
-    //    drawBrush(p, midPoint, pressure);
-    //    QPointF threeQuaterPoint = lastPointF + QPointF((lastPointF.x() - currentPoint.x()) / 4 * 3, (lastPointF.y() - currentPoint.y()) / 4 * 3);
-    //    drawBrush(p, threeQuaterPoint, pressure);
-    //}
+    // Draw brush 4 times equidistantly if distance is greater than 2.5
+    if (dist > 2.5 && spacing < 2.5) {
+        QPointF quaterPoint = lastPointF + QPointF((lastPointF.x() - currentPoint.x()) / 4, (lastPointF.y() - currentPoint.y()) / 4);
+        drawBrush(p, quaterPoint, pressure);
+        QPointF midPoint = lastPointF + QPointF((lastPointF.x() - currentPoint.x()) / 2, (lastPointF.y() - currentPoint.y()) / 2);
+        drawBrush(p, midPoint, pressure);
+        QPointF threeQuaterPoint = lastPointF + QPointF((lastPointF.x() - currentPoint.x()) / 4 * 3, (lastPointF.y() - currentPoint.y()) / 4 * 3);
+        drawBrush(p, threeQuaterPoint, pressure);
+    }
 
     if (dist > spacing || spacing != 0.0) {
         drawBrush(p, to, pressure);
@@ -558,29 +575,29 @@ void BrushTool::drawStroke(QPainter& p, const QPointF& from, const QPointF& to, 
 
 
 
-void BrushTool::drawBrush(QPainter& p, const QPointF& pos, qreal pressure)
+void BrushTool::drawBrush(QPainter& painter, const QPointF& pos, qreal pressure)
 {
-    qreal size = brushSize;
+    qreal AdjustedBrushSize = brushSize;
     if (pressureAffectsSize)
     {
-        qDebug() << pressure;
-        size = brushSize * pressure;
+        AdjustedBrushSize = brushSize * pressure;
     }
     if (!pressureAffectsOpacity)
     {
-        pressure = 1;
+        pressure = 1; // set pressure to 1 so multiplcation calculations arent affects
     }
-    QImage scaled = brush.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    QTransform t;
-    t.rotate(xTilt * 3);
 
-    scaled = scaled.transformed(t, Qt::SmoothTransformation);
+    // Scale brush and adjust to tilt rotation
+    QImage scaled = brush.scaled(AdjustedBrushSize, AdjustedBrushSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QTransform transform;
+    transform.rotate(xTilt * 3);
+    scaled = scaled.transformed(transform, Qt::SmoothTransformation);
 
     if (isErasing) {
-        p.setCompositionMode(QPainter::CompositionMode_DestinationOut);
+        painter.setCompositionMode(QPainter::CompositionMode_DestinationOut);
     }
     QPointF drawPos(pos.x() - scaled.width() / 2, pos.y() - scaled.height() / 2);
-    p.setOpacity(pressure * opacity);
+    painter.setOpacity(pressure * opacity);
 
     QImage temporarylayer = originalImage;
     temporarylayer.fill(Qt::transparent);
@@ -592,7 +609,7 @@ void BrushTool::drawBrush(QPainter& p, const QPointF& pos, qreal pressure)
         QPainterPath imagePath;
         imagePath.addPolygon(imagePolygon);
 
-
+        // Create clip path from all paths in selectionPaths to see if brush is within selection
         bool changed = false;
         for (int i = 0; i < selectionsPath.length(); ++i)
         {
@@ -623,21 +640,21 @@ void BrushTool::drawBrush(QPainter& p, const QPointF& pos, qreal pressure)
             }
         }
         QPainterPath clipPath = imagePath.subtracted(newPath[0]);
-        p.setClipPath(clipPath);
+        painter.setClipPath(clipPath);
     }
-    p.drawImage(drawPos, scaled);
+    painter.drawImage(drawPos, scaled);
 }
 
 QImage BrushTool::adjustBrushColour(const QImage& brush, const QColor& color)
 {
     if (brush.isNull())
-        return QImage();
+        return QImage(); // Safety check
 
     QImage coloured = brush.convertToFormat(QImage::Format_ARGB32);
 
-    QPainter p(&coloured);
-    p.setCompositionMode(QPainter::CompositionMode_SourceIn);
-    p.fillRect(coloured.rect(), colour);
-    p.end();
+    QPainter painter(&coloured);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    painter.fillRect(coloured.rect(), colour);
+    painter.end();
     return coloured;
 };

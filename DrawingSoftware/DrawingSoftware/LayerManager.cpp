@@ -39,7 +39,7 @@ LayerManager::LayerManager(QWidget* parent)
 
     layersList->setCurrentItem(layersList->item(1));
 
-
+    // Change selected layer
     onLayerClicked(layersList->item(1));
     {
         int index = 1;
@@ -48,6 +48,7 @@ LayerManager::LayerManager(QWidget* parent)
     connect(layersList, &QListWidget::itemClicked,
         this, &LayerManager::onLayerClicked);
 
+    // Add new layer
     connect(newLayerButton, &QPushButton::clicked, this, [=]() {
         int newIndex;
         if (layers.count() == 0)
@@ -64,6 +65,7 @@ LayerManager::LayerManager(QWidget* parent)
         QString name = QString("Layer %1").arg(layersAdded);
         addLayer(newIndex, name);
         });
+    // Delete Layer
     connect(deleteLayerButtton, &QPushButton::clicked,
         this, &LayerManager::onDeleteClicked);
 }
@@ -89,7 +91,6 @@ void LayerManager::addLayer(int destination, QString& name)
 
 }
 
-
 void LayerManager::undo()
 {
     if (undoStack2.size() <= 1) return;
@@ -106,6 +107,7 @@ void LayerManager::undo()
 
 void LayerManager::restore(const QStringList& state)
 {
+    // Required for unod and redo
     layersList->clear();
     for (const QString& name : state)
         layersList->addItem(name);

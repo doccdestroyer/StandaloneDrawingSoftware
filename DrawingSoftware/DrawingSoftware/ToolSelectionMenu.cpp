@@ -14,6 +14,7 @@ ToolSelectionMenu::ToolSelectionMenu(QMainWindow* parent) : QMainWindow(parent)
 
 void ToolSelectionMenu::createToolBar()
 {
+	// Create Tool Bar
 	QToolBar* toolBar = addToolBar(tr("Tools"));
 
 	toolBar->setMovable(false);
@@ -22,6 +23,7 @@ void ToolSelectionMenu::createToolBar()
 	toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 	toolBar->setAllowedAreas(Qt::LeftToolBarArea | Qt::RightToolBarArea);
 
+	// Create Action Buttons
 	brushAction = new QAction(
 		QIcon(QDir::currentPath() + "/Images/Icons/pen.png"),
 		tr("&BrushTool"),
@@ -100,6 +102,7 @@ void ToolSelectionMenu::createToolBar()
 		});
 	toolBar->addAction(eraserAction);
 
+	// Set Icon to Blue if Icon is Checked
 	toolBar->setStyleSheet(R"(
     QToolButton:checked {
         background-color: #448aff;
@@ -113,6 +116,7 @@ void ToolSelectionMenu::createToolBar()
 
 void ToolSelectionMenu::disableTool()
 {
+	// Select the tool and emit a signal to disable it 
 	if (selectedTool == "Brush")
 	{
 		brushAction->setChecked(false);

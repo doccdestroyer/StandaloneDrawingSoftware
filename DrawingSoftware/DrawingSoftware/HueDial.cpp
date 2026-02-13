@@ -6,31 +6,22 @@
 HueDial::HueDial(QWidget* parent) : QDial(parent)
 {
 
-    //signals:
-    //    void colorDialAngle(float angle);
-
-    //HueDial(QWidget * parent = nullptr)
-    //    : QDial(parent)
     {
         setMinimumSize(300, 300);
         setMaximumSize(300, 300);
         setWrapping(true);
         setStyleSheet("border: 0");
 
-
+        // Repaint UI when dial moves
         connect(this, &QDial::valueChanged, this, [this](int change) {
             emit change;
-            update();  // repaint when dial moves
+            update();
             });
-
-
-
 
         QRectF windowArea = rect();
         qreal windowSide = qMin(windowArea.width(), windowArea.height());
 
         outerRect = QRect((width() - windowSide) / 2, (height() - windowSide) / 2, windowSide, windowSide);
-
         thickness = windowSide * 0.075;
         innerRect = outerRect.adjusted(thickness, thickness, -thickness, -thickness);
     }
@@ -51,6 +42,7 @@ float HueDial::getLightness() const
     return qBound(0.0f, lightness, 1.0f);
 }
 
+// Lock dial location within triangle's edge even when dragged out of it
 QPointF HueDial::projectPointToSegment(
     const QPointF& p,
     const QPointF& a,
@@ -69,6 +61,7 @@ QPointF HueDial::projectPointToSegment(
     return a + (b - a) * t;
 }
 
+// General clamp to triangle when dragged outside of it
 QPointF HueDial::clampToTriangle(const QPointF& mousePos)
 {
     if (triangle.containsPoint(mousePos, Qt::OddEvenFill))
@@ -87,7 +80,7 @@ QPointF HueDial::clampToTriangle(const QPointF& mousePos)
 }
 
 
-
+// Barycentric algebra used for triangular gradients/locations
 void HueDial::barycentricPoints(
     const QPointF& p1,
     const QPointF& p2,
@@ -112,6 +105,7 @@ void HueDial::barycentricPoints(
     w3 = 1.0f - w1 - w2;
 }
 
+// Get angle on the dial based on mouse click position
 float HueDial::angleFromMouse(const QPoint& pos)
 {
     QPointF center = rect().center();
@@ -137,13 +131,13 @@ void HueDial::mousePressEvent(QMouseEvent* event)
 
     clickPosition = QPointF(event->pos());
 
-
+    // Establish "inRing" boundaries by locaiton
     QPointF center = rect().center();
     QPointF delta = clickPosition - center;
     qreal dist = std::hypot(delta.x(), delta.y());
-
     inRing = (dist >= innerRadius) && (dist <= outerRadius);
 
+    // Calculate ring dimensions used for triangle calculation
     float r = qMin(width(), height()) * 0.735f;
     float h = std::sqrt(3.0f) * r / 2.0f;
 
@@ -151,6 +145,7 @@ void HueDial::mousePressEvent(QMouseEvent* event)
     p2 = QPointF(r / 2, h / 3);
     p3 = QPointF(0, -2 * h / 3);
 
+    // Rotate triangle and poinbts relative to the centre
     QTransform t;
     t.translate(center.x(), center.y());
     t.rotate(-22.5);
@@ -160,8 +155,10 @@ void HueDial::mousePressEvent(QMouseEvent* event)
     p2 = t.map(p2 + center);
     p3 = t.map(p3 + center);
 
+    // Create triangle
     triangle << p1 << p2 << p3;
 
+    // Check if in hue ring or lightness/saturation triangle
     if (inRing) {
         setValue(angleFromMouse(event->pos()));
         inTriangle = false;
@@ -211,7 +208,7 @@ void HueDial::paintEvent(QPaintEvent* event)
     QRectF windowArea = rect();
     qreal windowSide = qMin(windowArea.width(), windowArea.height());
 
-
+    // Dial knob locations
     qreal knobRadius = windowSide * 0.028;
     qreal knobDistance = windowSide / 2.135 - windowSide * 0.008;
 
@@ -219,6 +216,7 @@ void HueDial::paintEvent(QPaintEvent* event)
     p.setPen(QPen(Qt::white, 2));
     p.setBrush(Qt::NoBrush);
 
+    // Draw two dials for H/SL
     p.save();
     p.translate(center);
     p.rotate(value());
@@ -229,6 +227,4 @@ void HueDial::paintEvent(QPaintEvent* event)
     p.save();
     p.drawEllipse(center - offset, knobRadius, knobRadius);
     p.restore();
-
 }
-

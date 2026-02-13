@@ -58,6 +58,7 @@ void ColourWindow::createWheel()
 
 void ColourWindow::paintEvent(QPaintEvent*)
 {
+    // Same maths as the dial construction but used for painting the gradients
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
@@ -65,7 +66,6 @@ void ColourWindow::paintEvent(QPaintEvent*)
     qreal windowSide = qMin(windowArea.width(), windowArea.height());
 
     QRectF outerRect((width() - windowSide) / 2, (height() - windowSide) / 2, windowSide, windowSide);
-
     qreal thickness = windowSide * 0.075;
     QRectF innerRect = outerRect.adjusted(thickness, thickness, -thickness, -thickness);
 
@@ -75,6 +75,7 @@ void ColourWindow::paintEvent(QPaintEvent*)
 
     ring.setFillRule(Qt::OddEvenFill);
 
+    // Hue gradient
     QConicalGradient gradient(rect().center(), 0);
     gradient.setColorAt(0.0, Qt::red);
     gradient.setColorAt(0.17, Qt::yellow);
@@ -107,7 +108,7 @@ void ColourWindow::paintEvent(QPaintEvent*)
     QPointF b = p2 + imgCenter;
     QPointF c = p3 + imgCenter;
 
-
+    // Barycentric gradient
     QColor ca = Qt::black;
     QColor cb = QColor::fromHsv(360 - hueAngle(), 255, 255);
     QColor cc = Qt::white;

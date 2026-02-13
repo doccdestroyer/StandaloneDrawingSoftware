@@ -68,6 +68,7 @@ void RectangularSelectionTool::applyZoom(float zoomAmount)
 
 void RectangularSelectionTool::undo()
 {
+    // Undo from manager and update local variables accordingly
     uiManager->undoManager->undo();
     layers = layerManager->layers;
     overlay = layerManager->selectionOverlay;
@@ -79,6 +80,7 @@ void RectangularSelectionTool::undo()
 
 void RectangularSelectionTool::redo()
 {
+    // Redo from manager and update local variables accordingly
     uiManager->undoManager->redo();
     layers = layerManager->layers;
     overlay = layerManager->selectionOverlay;
@@ -139,7 +141,6 @@ void RectangularSelectionTool::keyReleaseEvent(QKeyEvent* event)
         panningEnabled = false;
         setCursor(Qt::ArrowCursor);
     }
-
 }
 
 void RectangularSelectionTool::mousePressEvent(QMouseEvent* event)
@@ -166,6 +167,7 @@ void RectangularSelectionTool::mousePressEvent(QMouseEvent* event)
 
             else
             {
+                // Restart/Start new Selection
                 makingAdditionalSelection = false;
                 makingRemoval = false;
                 selectionsPath.clear();
@@ -188,11 +190,13 @@ void RectangularSelectionTool::mouseMoveEvent(QMouseEvent* event)
     {
         if (!lastPanPoint.isNull())
         {
+            // Update panning offset based on amount moved
             QPoint change = event->position().toPoint() - lastPanPoint;
             panOffset += change;
             lastPanPoint = event->position().toPoint();
         }
     }
+    // Update drawing modifiers
     else if (isDrawing) {
         if (event->modifiers() & Qt::AltModifier)
         {
@@ -210,7 +214,6 @@ void RectangularSelectionTool::mouseMoveEvent(QMouseEvent* event)
         {
             isDrawingSquare = false;
         }
-
         hoverPoint = mapToImage(event->pos());
         updateSelectionOverlay();
     }
@@ -234,10 +237,13 @@ void RectangularSelectionTool::mouseReleaseEvent(QMouseEvent* event)
             if (isDrawingSquare)
             {
                 isDrawingSquare = false;
+
+                // Find smallest axis difference from start point
                 xDifference = (releasePoint.x() - startPoint.x());
                 yDifference = (releasePoint.y() - startPoint.y());
                 float variance = std::min(abs(xDifference), abs(yDifference));
 
+                // Calculate if direction is positive or negative for each axis
                 int directionX;
                 int directionY;
                 if (xDifference < 0)
@@ -281,6 +287,7 @@ void RectangularSelectionTool::mouseReleaseEvent(QMouseEvent* event)
                 update();
             }
 
+            // Removal logic
             QPolygonF newPolygonF = QPolygonF(QPolygon(QRect(startPoint, releasePoint)));
             QPainterPath newPath;
             newPath.addPolygon(newPolygonF);
@@ -325,6 +332,7 @@ void RectangularSelectionTool::mouseReleaseEvent(QMouseEvent* event)
                 }
 
             }
+            // Additional selection lgoic
             else if (makingAdditionalSelection)
             {
                 bool mergedAnyPolygons = false;
@@ -375,6 +383,7 @@ void RectangularSelectionTool::mouseReleaseEvent(QMouseEvent* event)
         }
 
     }
+    // Update shared and local variables
     updateSelectionOverlay();
     update();
     uiManager->undoManager->selectionOverlay = overlay;
@@ -390,10 +399,9 @@ void RectangularSelectionTool::mouseReleaseEvent(QMouseEvent* event)
 void RectangularSelectionTool::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
-    //QPoint hoverOffset = center - hoverPoint.toPoint();
-
     QPoint center = rect().center();
 
+    // Translate based on zoom and pan offset
     painter.translate(center);
     painter.scale(zoomPercentage / 100, zoomPercentage / 100);
     painter.translate(panOffset / (zoomPercentage / 100.0));
@@ -402,13 +410,15 @@ void RectangularSelectionTool::paintEvent(QPaintEvent* event)
     painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
     QPointF topLeft(-image.width() / 2.0, -image.height() / 2.0);
-    painter.fillRect(rect(), Qt::black);
 
+    // Draw background
     painter.drawImage(topLeft, pngBackground);
 
+    // Draw Layers
     for (const QImage layer : layers) {
         painter.drawImage(topLeft, layer);
     }
+    // Draw Selection
     painter.drawImage(topLeft, overlay);
 }
 
@@ -420,7 +430,7 @@ void RectangularSelectionTool::clearSelectionOverlay()
 
 void RectangularSelectionTool::updateSelectionOverlay()
 {
-
+    // Same logic as paint event but for selection overlay, TO BE CHANGED INTO FUNCTIONS AT A LATER DATE
     overlay.fill(Qt::transparent);
     QPainter painter(&overlay);
     painter.setRenderHint(QPainter::Antialiasing);
@@ -438,6 +448,7 @@ void RectangularSelectionTool::updateSelectionOverlay()
     painter.setPen(outlinePen);
     painter.setBrush(fillBrush);
 
+    // Draw all selecitons
     for (const QPainterPath& path : selectionsPath) {
         QVector<QPolygonF> allPolys = path.toFillPolygons();
         for (const QPolygonF& polyF : allPolys) {

@@ -75,6 +75,7 @@ void PolygonalLassoTool::applyZoom(float zoomAmount)
 
 void PolygonalLassoTool::undo()
 {
+    // Check if can undo
     if (isCompletedUndoStack.size() <= 1) return;
     if (isDrawingUndoStack.size() <= 1) return;
     if (makingAdditionalSelectionUndoStack.size() <= 1) return;
@@ -82,6 +83,7 @@ void PolygonalLassoTool::undo()
     if (makingRemovalUndoStack.size() <= 1) return;
     if (isFirstClickUndoStack.size() <= 1) return;
 
+    // Undo shared and local variables
     uiManager->undoManager->undo();
     layers = layerManager->layers;
     overlay = layerManager->selectionOverlay;
@@ -112,13 +114,14 @@ void PolygonalLassoTool::undo()
 
 void PolygonalLassoTool::redo()
 {
-
+    // Check if can redo
     if (isFirstClickRedoStack.isEmpty()) return;
     if (isCompletedRedoStack.isEmpty()) return;
     if (isDrawingRedoStack.isEmpty()) return;
     if (makingAdditionalSelectionRedoStack.isEmpty()) return;
     if (pointsRedoStack.isEmpty()) return;
 
+    // Redo shared and local variables
     uiManager->undoManager->redo();
     layers = layerManager->layers;
     overlay = layerManager->selectionOverlay;
@@ -192,7 +195,6 @@ void PolygonalLassoTool::keyReleaseEvent(QKeyEvent* event)
         panningEnabled = false;
         setCursor(Qt::ArrowCursor);
     }
-
 }
 
 QPainterPath PolygonalLassoTool::mapPointsOfPolygon(QPolygonF polygon, int numberOfPoints)
@@ -200,6 +202,7 @@ QPainterPath PolygonalLassoTool::mapPointsOfPolygon(QPolygonF polygon, int numbe
     QPainterPath path;
     path.addPolygon(polygon);
 
+    // Separate points on polygon into the desired amount of points
     for (int i = 0; i < numberOfPoints; i++)
     {
         path.pointAtPercent(i / numberOfPoints - 1);
@@ -219,6 +222,8 @@ void PolygonalLassoTool::mousePressEvent(QMouseEvent* event)
         else
         {
             point = mapToImage(event->pos());
+
+            /////// FIRST CLICK LOGIC
             if (isFirstClick) {
             
                 isComplete = false;
@@ -248,8 +253,10 @@ void PolygonalLassoTool::mousePressEvent(QMouseEvent* event)
                 }
                 update();
             }
+            /////// MULTIPLE CLICKS LOGIC
             else
             {
+                // Check if recent point is close enough to first point to finish selection
                 if ((point - points[0]).manhattanLength() < 20)
                 {
                     isComplete = true;
@@ -270,6 +277,7 @@ void PolygonalLassoTool::mousePressEvent(QMouseEvent* event)
                     QPainterPath newPath;
                     newPath.addPolygon(newPolygonF);
 
+                    // If not making additonal or removal, clear previous polygons and add the new one
                     if (!makingRemoval && !makingAdditionalSelection && isComplete)
                     {
                         selectionsPath.clear();
@@ -279,9 +287,8 @@ void PolygonalLassoTool::mousePressEvent(QMouseEvent* event)
                     {
                         if (makingRemoval)
                         {
+                            // Removal logic
                             bool removedFromMerge = false;
-
-
                             for (int i = 0; i < selectionsPath.length(); ++i)
                             {
                                 QPainterPath& path = selectionsPath[i];
@@ -317,6 +324,7 @@ void PolygonalLassoTool::mousePressEvent(QMouseEvent* event)
                             }
 
                         }
+                        // Additional selection logic
                         else if (makingAdditionalSelection)
                         {
                             bool mergedAnyPolygons = false;
@@ -368,6 +376,7 @@ void PolygonalLassoTool::mousePressEvent(QMouseEvent* event)
 
                 }
             }
+            // Push Undos
             pointsUndoStack.push(points);
             isFirstClickUndoStack.push(isFirstClick);
 
@@ -397,6 +406,7 @@ void PolygonalLassoTool::mouseMoveEvent(QMouseEvent* event)
     {
         if (!lastPanPoint.isNull())
         {
+            // Update offset based on change in movement
             QPoint change = event->position().toPoint() - lastPanPoint;
             panOffset += change;
             lastPanPoint = event->position().toPoint();
@@ -428,6 +438,7 @@ void PolygonalLassoTool::paintEvent(QPaintEvent* event)
 
     QPoint center = rect().center();
 
+    // Translate painter to take into account zoom and pan offset
     painter.translate(center);
     painter.scale(zoomPercentage / 100, zoomPercentage / 100);
     painter.translate(panOffset / (zoomPercentage / 100.0));
@@ -437,12 +448,15 @@ void PolygonalLassoTool::paintEvent(QPaintEvent* event)
 
     QPointF topLeft(-image.width() / 2.0, -image.height() / 2.0);
     painter.fillRect(rect(), Qt::black);
-
+    
+    // Draw background
     painter.drawImage(topLeft, pngBackground);
 
+    // Draw layers
     for (const QImage layer : layers) {
         painter.drawImage(topLeft, layer);
     }
+    // Draw overlay
     painter.drawImage(topLeft, overlay);
 }
 
@@ -472,6 +486,7 @@ void PolygonalLassoTool::updateSelectionOverlay()
     painter.setPen(outlinePen);
     painter.setBrush(fillBrush);
 
+    // Draw all selections
     for (const QPainterPath& path : selectionsPath) {
         QVector<QPolygonF> allPolys = path.toFillPolygons();
         for (const QPolygonF& polyF : allPolys) {
@@ -497,4 +512,3 @@ void PolygonalLassoTool::updateSelectionOverlay()
     }
     update();
 }
-

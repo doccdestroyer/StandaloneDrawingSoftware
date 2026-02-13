@@ -8,14 +8,16 @@ MenuBar::MenuBar(QWidget* parent)
   
     QVBoxLayout* layout = new QVBoxLayout(this);
 
+    // Create Menu Bar
     QMenuBar* menuBar = new QMenuBar(this);
     layout->setMenuBar(menuBar);
 
+    // Create Submenus
     QMenu* editMenu = menuBar->addMenu("Edit");
     QMenu* selectionMenu = menuBar->addMenu("Selections");
     QMenu* brushMenu = menuBar->addMenu("Brushes");
 
-
+    // Create DropDowns
     QAction* undoAction = new QAction("&Undo", this);
     connect(undoAction, &QAction::triggered, this, [&]() {
         emit undoPressed();

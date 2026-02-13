@@ -184,7 +184,7 @@ void LassoTool::mouseMoveEvent(QMouseEvent* event)
         }
     }
     else {
-
+        // Add current position to current selection path of points
         points.append(mapToImage(event->pos()));
         updateSelectionOverlay();
     }
@@ -198,6 +198,7 @@ void LassoTool::mouseReleaseEvent(QMouseEvent* event)
         if (isPanning) {
             isPanning = false;
         }
+        // Check if path is long enough to make selection
         if (points.length() <= 2)
         {
             points.clear();
@@ -212,6 +213,7 @@ void LassoTool::mouseReleaseEvent(QMouseEvent* event)
             return;
         }
 
+        // Add first point to end to finish selection
         points.append(points[0]);
         selection = QPolygon(points);
         QPainterPath newPath = QPainterPath();
@@ -219,9 +221,8 @@ void LassoTool::mouseReleaseEvent(QMouseEvent* event)
 
         if (makingRemoval)
         {
+            // Removal lgoic
             bool removedFromMerge = false;
-
-
             for (int i = 0; i < selectionsPath.length(); ++i)
             {
                 QPainterPath& path = selectionsPath[i];
@@ -257,6 +258,7 @@ void LassoTool::mouseReleaseEvent(QMouseEvent* event)
             }
 
         }
+        // Addtional selection logic
         else if (makingAdditionalSelection)
         {
             bool mergedAnyPolygons = false;
@@ -305,6 +307,7 @@ void LassoTool::mouseReleaseEvent(QMouseEvent* event)
             }
         }
     }
+    // Reset current seleciton list and push
     points.clear();
 
     updateSelectionOverlay();
@@ -321,6 +324,7 @@ void LassoTool::paintEvent(QPaintEvent* event)
     QPainter painter(this);
     QPoint center = rect().center();
 
+    // Translate based on zoom and offset
     painter.translate(center);
     painter.scale(zoomPercentage / 100, zoomPercentage / 100);
     painter.translate(panOffset / (zoomPercentage / 100.0));
@@ -329,13 +333,14 @@ void LassoTool::paintEvent(QPaintEvent* event)
     painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
     QPointF topLeft(-image.width() / 2.0, -image.height() / 2.0);
-    painter.fillRect(rect(), Qt::black);
 
+    // Draw background
     painter.drawImage(topLeft, pngBackground);
-
+    // Draw layers
     for (const QImage layer : layers) {
         painter.drawImage(topLeft, layer);
     }
+    //Draw Overlay
     painter.drawImage(topLeft, overlay);
 }
 
@@ -366,6 +371,7 @@ void LassoTool::updateSelectionOverlay()
     painter.setPen(outlinePen);
     painter.setBrush(fillBrush);
 
+    // Draw each path as a polygon in selectionPaths
     for (const QPainterPath& path : selectionsPath) {
         QVector<QPolygonF> allPolys = path.toFillPolygons();
         for (const QPolygonF& polyF : allPolys) {

@@ -24,7 +24,7 @@ BrushControlsWindow::BrushControlsWindow(QMainWindow* parent)
 	toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 	toolBar->setAllowedAreas(Qt::LeftToolBarArea | Qt::RightToolBarArea);
 
-
+	//////////////////////// Create Pen Pressure Controls for Size
 	QCheckBox* affectSizeBox = new QCheckBox("Pen Pressure: Affects Size", this);
 	affectSizeBox->setChecked(true);
 	connect(affectSizeBox, &QCheckBox::toggled, [this](bool checked) {
@@ -49,6 +49,7 @@ BrushControlsWindow::BrushControlsWindow(QMainWindow* parent)
 		emit sizeSliderChanged(value);
 		});
 
+	//////////////////////// Create Pen Pressure Controls for Opacity
 	QCheckBox* affectOpacityBox = new QCheckBox("Pen Pressure: Affects Opacity", this);
 	connect(affectOpacityBox, &QCheckBox::toggled, [this](bool checked) {
 		if (OpacityEnabled)
@@ -72,6 +73,7 @@ BrushControlsWindow::BrushControlsWindow(QMainWindow* parent)
 		emit opacitySliderChanged(value);
 		});
 
+	//////////////////////// Create bool box for Tilt
 	QCheckBox* enableTiltBox = new QCheckBox("Enable Tilt", this);
 	connect(enableTiltBox, &QCheckBox::toggled, [this](bool checked) {
 		if (TiltEnabled)
@@ -86,6 +88,7 @@ BrushControlsWindow::BrushControlsWindow(QMainWindow* parent)
 		}
 		});
 
+	//////////////////////// Create buttons for different brush presets
 	QAction* chalkAction = new QAction(
 		QIcon(QDir::currentPath() + "/Images/BrushIcons/ChalkIcon.png"),
 		tr("&BrushTool"),
@@ -136,6 +139,7 @@ BrushControlsWindow::BrushControlsWindow(QMainWindow* parent)
 		});
 	toolBar->addAction(penAction);
 
+	//////////////////////// Initalise docks
 	QDockWidget* detailDock = new QDockWidget(this);
 	detailDock->setFeatures(QDockWidget::NoDockWidgetFeatures);
 	detailDock->setWidget(toolBar);
@@ -184,6 +188,7 @@ BrushControlsWindow::BrushControlsWindow(QMainWindow* parent)
 	addDockWidget(Qt::LeftDockWidgetArea, enableTiltDock);
 	enableTiltDock->setFloating(false);
 
+	//////////////////////// Split docks
 	splitDockWidget(sizePressureDockSlider, sizePressureDockLabel, Qt::Horizontal);
 	splitDockWidget(sizePressureDockBox, sizePressureDockSlider, Qt::Vertical);
 	splitDockWidget(opacityPressureDockSlider, opacityPressureDockLabel, Qt::Horizontal);
