@@ -30,11 +30,11 @@ MenuBar::MenuBar(QWidget* parent)
         });
     editMenu->addAction(redoAction);
 
-    QAction* clearAction = new QAction("&Clear Layer or Selection", this);
-    connect(clearAction, &QAction::triggered, this, [&]() {
-        emit clearPressed();
+    QAction* clearSelectionAction = new QAction("&Clear Selections", this);
+    connect(clearSelectionAction, &QAction::triggered, this, [&]() {
+        emit clearSelectionPressed();
         });
-    editMenu->addAction(clearAction);
+    selectionMenu->addAction(clearSelectionAction);
 
     QAction* expandSelectionAction = new QAction("&Expand Selections", this);
     connect(expandSelectionAction, &QAction::triggered, this, [&]() {

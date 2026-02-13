@@ -376,7 +376,7 @@ void BrushTool::alterBrushSize(int multiplier)
 void BrushTool::mousePressEvent(QMouseEvent* event)
 {
     layers = layerManager->layers;
-    if (usingTablet == true) return;
+    //if (usingTablet == true) return;
     if (layers.count() < 1) return;
 
     selectionsPath = layerManager->selectionsPath;
@@ -396,7 +396,7 @@ void BrushTool::mousePressEvent(QMouseEvent* event)
 void BrushTool::mouseMoveEvent(QMouseEvent* event)
 {
 
-    if (usingTablet == true) return; // Do not register mouse if using tablet
+    //if (usingTablet == true) return; // Do not register mouse if using tablet
     if (layers.count() < 1) return;
     if (isPanning)
     {
@@ -557,14 +557,14 @@ void BrushTool::drawStroke(QPainter& p, const QPointF& from, const QPointF& to, 
     qreal dist = line.length();
 
     // Draw brush 4 times equidistantly if distance is greater than 2.5
-    if (dist > 2.5 && spacing < 2.5) {
-        QPointF quaterPoint = lastPointF + QPointF((lastPointF.x() - currentPoint.x()) / 4, (lastPointF.y() - currentPoint.y()) / 4);
-        drawBrush(p, quaterPoint, pressure);
-        QPointF midPoint = lastPointF + QPointF((lastPointF.x() - currentPoint.x()) / 2, (lastPointF.y() - currentPoint.y()) / 2);
-        drawBrush(p, midPoint, pressure);
-        QPointF threeQuaterPoint = lastPointF + QPointF((lastPointF.x() - currentPoint.x()) / 4 * 3, (lastPointF.y() - currentPoint.y()) / 4 * 3);
-        drawBrush(p, threeQuaterPoint, pressure);
-    }
+    //if (dist > 2.5 && spacing < 2.5) {
+    //    QPointF quaterPoint = lastPointF + QPointF((lastPointF.x() - currentPoint.x()) / 4, (lastPointF.y() - currentPoint.y()) / 4);
+    //    drawBrush(p, quaterPoint, pressure);
+    //    QPointF midPoint = lastPointF + QPointF((lastPointF.x() - currentPoint.x()) / 2, (lastPointF.y() - currentPoint.y()) / 2);
+    //    drawBrush(p, midPoint, pressure);
+    //    QPointF threeQuaterPoint = lastPointF + QPointF((lastPointF.x() - currentPoint.x()) / 4 * 3, (lastPointF.y() - currentPoint.y()) / 4 * 3);
+    //    drawBrush(p, threeQuaterPoint, pressure);
+    //}
 
     if (dist > spacing || spacing != 0.0) {
         drawBrush(p, to, pressure);
