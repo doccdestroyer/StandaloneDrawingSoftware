@@ -1,10 +1,7 @@
 #pragma once
 
-
 #include <QWidget>
-//#include <QStack>
 #include <QImage>
-//#include <QVector>
 #include <QDir>
 
 #include <QMouseEvent>
@@ -69,10 +66,6 @@ public:
     QStack<QVector<QPoint>> pointsUndoStack;
     QStack<QVector<QPoint>> pointsRedoStack;
 
-
-
-
-
 signals:
     void polygonalLassoDisabled();
 
@@ -91,14 +84,11 @@ protected:
     void mouseReleaseEvent(QMouseEvent* event) override;
 
     void paintEvent(QPaintEvent* event) override;
-    //void updateSelectionOverlay();
-    //void clearSelectionOverlay();
 
     QPainterPath mapPointsOfPolygon(QPolygonF polygon, int numberOfPoints);
 
 private:
     UIManager* uiManager;
-
 
     QPoint point;
     QPoint hoverPoint;
@@ -118,4 +108,3 @@ private:
     bool isPanning;
     bool panningEnabled;
 };
-

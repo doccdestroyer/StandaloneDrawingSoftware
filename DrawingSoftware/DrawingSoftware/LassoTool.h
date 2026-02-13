@@ -1,12 +1,8 @@
 #pragma once
 
-
 #include <QWidget>
-//#include <QStack>
 #include <QImage>
-//#include <QVector>
 #include <QDir>
-
 #include <QMouseEvent>
 #include <QTabletEvent>
 #include <QPainter>
@@ -36,14 +32,12 @@ public:
 
     QVector<QPainterPath> selectionsPath;
 
-
     void zoomIn();
     void zoomOut();
     void resetZoom();
 
     void clearSelectionOverlay();
     void updateSelectionOverlay();
-
 
     void undo();
     void redo();
@@ -65,7 +59,6 @@ protected:
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
-
     void paintEvent(QPaintEvent* event) override;
 
 private:
@@ -89,4 +82,3 @@ private:
 
     bool panningEnabled;
 };
-

@@ -49,7 +49,6 @@ private:
     int layersAdded = 1;
 
     QString layer;
-    //QListWidget* layersList = nullptr;
 
     QStack<QListWidget*> undoStack;
     QStack<QListWidget*> redoStack;
@@ -61,8 +60,3 @@ private:
 
     bool changingStack;
 };
-
-
-
-
-

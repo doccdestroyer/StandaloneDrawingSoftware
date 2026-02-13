@@ -100,4 +100,3 @@ private:
     QPainterPath mapPointsOfPolygon(QPolygonF polygon, int numberOfPoints);
 
 };
-

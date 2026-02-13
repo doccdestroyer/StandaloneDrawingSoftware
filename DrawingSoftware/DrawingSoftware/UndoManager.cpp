@@ -85,5 +85,3 @@ void UndoManager::redo()
     layerManager->update();
     update();
 }
-
-

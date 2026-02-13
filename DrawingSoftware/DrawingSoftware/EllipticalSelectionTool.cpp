@@ -90,41 +90,33 @@ void EllipticalSelectionTool::keyPressEvent(QKeyEvent* event)
     {
         zoomIn();
     }
-
     if (event->key() == 45 && event->modifiers() & Qt::ControlModifier)
     {
         zoomOut();
     }
-
     if (event->key() == Qt::Key_0 && event->modifiers() & Qt::ControlModifier)
     {
         resetZoom();
     }
-
     if (event->key() == Qt::Key_Z && event->modifiers() & Qt::ControlModifier)
     {
         undo();
     }
-
     if (event->key() == Qt::Key_Y && event->modifiers() & Qt::ControlModifier)
     {
         redo();
     }
-
     if (event->key() == Qt::Key_Space)
     {
         panningEnabled = true;
         setCursor(Qt::OpenHandCursor);
     }
-
     if (event->key() == Qt::Key_B)
     {
         emit ellipticalSelectionToolDisabled();
-
         emit brushEnabled();
     }
 }
-
 void EllipticalSelectionTool::keyReleaseEvent(QKeyEvent* event)
 {
     if (event->isAutoRepeat())
@@ -137,7 +129,6 @@ void EllipticalSelectionTool::keyReleaseEvent(QKeyEvent* event)
         panningEnabled = false;
         setCursor(Qt::ArrowCursor);
     }
-
 }
 
 void EllipticalSelectionTool::mousePressEvent(QMouseEvent* event)
@@ -354,7 +345,8 @@ void EllipticalSelectionTool::mouseReleaseEvent(QMouseEvent* event)
                                 if (selectionsPath[i].intersects(otherPath))
                                 {
                                     selectionsPath[i] = selectionsPath[i].united(otherPath);
-                                    selectionsPath.erase(selectionsPath.begin() + j);                                    changed = true;
+                                    selectionsPath.erase(selectionsPath.begin() + j);
+                                    changed = true;
                                     break;
                                 }
 
@@ -408,8 +400,6 @@ QPainterPath EllipticalSelectionTool::mapPointsOfPolygon(QPolygonF polygon, int 
 void EllipticalSelectionTool::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
-    //QPoint hoverOffset = center - hoverPoint.toPoint();
-
     QPoint center = rect().center();
 
     painter.translate(center);
@@ -443,20 +433,12 @@ void EllipticalSelectionTool::updateSelectionOverlay()
     QPainter painter(&overlay);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-    //QPainter painter(This);
     QPoint center = image.rect().center();
-    //QPoint hoverOffset = center - hoverPoint.toPoint();
-
-    //painter.translate(center);
-    //painter.scale(zoomPercentage / 100, zoomPercentage / 100);
-    //painter.translate(panOffset / (zoomPercentage / 100.0));
 
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
-    //QPointF topLeft(-image.width() / 2.0, -image.height() / 2.0);
     QPointF topLeft(center);
-
 
     QPen outlinePen = QPen(Qt::red, 1);
     QBrush fillBrush = QBrush(QColor(255, 0, 0, 50));

@@ -39,27 +39,16 @@ public:
 
     UIManager* uiManager;
 
-    //signals:
-
-
-    //private slots:
-
 protected:
-    //void tabletEvent(QTabletEvent* event) override;
     void keyPressEvent(QKeyEvent* event) override;
     void keyReleaseEvent(QKeyEvent* event) override;
     void applyZoom(float zoomAmount);
-
-    //QPoint getScaledPoint(QPoint pos);
-    //QPointF getScaledPointF(QPointF pos);
 
     void mousePressEvent(QMouseEvent* event) override;
     void paintEvent(QPaintEvent* event) override;
 
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
-
-    //void dfs(QImage image, int pixelX, int pixelY, QColor oldColor, QColor newColor);
 
     QImage fill(QImage& image, int startX, int startY, const QColor& oldColor, const QColor& newColor);
 
@@ -69,18 +58,12 @@ signals:
 
     void bucketDisabled();
 
-
-
-private slots:
-    //void changeToLasso();
-
 private:
     bool panningEnabled = false;
     bool isPanning = false;
     QPoint lastPanPoint;
 
     bool inSelection;
-
 
     QColor newColour = QColor(Qt::red);
 
@@ -91,8 +74,6 @@ private:
     QPointF hoverPoint;
     QPointF pan;
 
-    //LayerManager* layerManager;
-
     qreal xTilt;
     qreal yTilt;
     bool drawing = false;
@@ -100,8 +81,6 @@ private:
     bool isErasing = false;
     bool isDrawing = false;
     int delayCounter;
-
-
 
     QPoint lastPoint;
     QPointF lastPointF;
@@ -111,22 +90,14 @@ private:
     QImage originalImage;
     QImage selectedImage;
 
-
     QStack<QVector<QImage>> undoStack;
     QStack<QVector<QImage>> redoStack;
 
 
     QColor colour;
 
-
-    //void removeLayer(int layer);
-    //void pushUndo(const QVector<QImage>& layers);
     QPoint mapToImage(const QPoint& p);
     QPointF mapToImageF(const QPointF& p);
 
-    //void drawStroke(QPainter& p, const QPointF& from, const QPointF& to, qreal pressure);
-    //void drawBrush(QPainter& p, const QPointF& pos, qreal pressure);
     QImage adjustBrushColour(const QImage& brush, const QColor& color);
 };
-
-

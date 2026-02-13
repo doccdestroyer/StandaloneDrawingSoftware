@@ -13,6 +13,7 @@
 #include <QSlider>
 #include <QString>
 #include <QLabel>
+
 class BrushControlsWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -41,7 +42,6 @@ signals:
 	void scatteringSliderChanged(int value);
 	
 private:
-	//QDockWidget* dock;
 	QListWidget* controlsList = nullptr;
 	void onSettingClicked(QListWidgetItem* item);
 
@@ -49,5 +49,4 @@ private:
 	bool SizePressureEnabled = true;
 	bool OpacityEnabled = false;
 	bool ScatteringEnabled = false;
-	//void callFunction(QLabel* sizeLabel, int value);
 };

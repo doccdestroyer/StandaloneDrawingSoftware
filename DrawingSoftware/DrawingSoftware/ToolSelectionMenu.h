@@ -6,14 +6,11 @@
 #include <QIcon>
 #include <QDir>
 #include <QAction>
-
 #include <QVBoxLayout>
 #include <QDockWidget>
-
-
 #include <QMenuBar>
-
 #include <QActionGroup>
+
 class ToolSelectionMenu : public QMainWindow
 {
     Q_OBJECT
@@ -23,10 +20,7 @@ public:
     QDockWidget* dock;
     std::string selectedTool;
 
-
 signals:
-    //void disbaleAllTools();
-
     void brushEnabled();
     void lassoEnabled();
     void bucketEnabled();
@@ -56,10 +50,7 @@ private:
     QAction* ellipticalSelectionAction;
     QAction* eraserAction;
 
-    //void createToolBars();
     void createToolBar();
-    //void updateTool();
-    //void refreshTool();
 
     void enableBrushTool();
     void enableLassoTool();
@@ -71,8 +62,4 @@ private:
     void enableEraserTool();
 
     void disableTool();
-
-
-
 };
-

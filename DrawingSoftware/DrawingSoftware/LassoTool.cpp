@@ -2,8 +2,6 @@
 #include "LassoTool.h"
 #include <LayerManager.h>
 
-
-
 #include<HueDial.h>
 
 
@@ -37,8 +35,6 @@ LassoTool::LassoTool(UIManager* ui, QWidget* parent)
     layers = layerManager->layers;
     layerManager->layers = layers;
     layerManager->update();
-
-
 }
 
 void LassoTool::zoomIn()
@@ -286,7 +282,8 @@ void LassoTool::mouseReleaseEvent(QMouseEvent* event)
                             if (selectionsPath[i].intersects(otherPath))
                             {
                                 selectionsPath[i] = selectionsPath[i].united(otherPath);
-                                selectionsPath.erase(selectionsPath.begin() + j);                                    changed = true;
+                                selectionsPath.erase(selectionsPath.begin() + j);
+                                changed = true;
                                 break;
                             }
 
@@ -322,8 +319,6 @@ void LassoTool::mouseReleaseEvent(QMouseEvent* event)
 void LassoTool::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
-    //QPoint hoverOffset = center - hoverPoint.toPoint();
-
     QPoint center = rect().center();
 
     painter.translate(center);
@@ -357,18 +352,11 @@ void LassoTool::updateSelectionOverlay()
     QPainter painter(&overlay);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-    //QPainter painter(This);
     QPoint center = image.rect().center();
-    //QPoint hoverOffset = center - hoverPoint.toPoint();
-
-    //painter.translate(center);
-    //painter.scale(zoomPercentage / 100, zoomPercentage / 100);
-    //painter.translate(panOffset / (zoomPercentage / 100.0));
 
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
-    //QPointF topLeft(-image.width() / 2.0, -image.height() / 2.0);
     QPointF topLeft(center);
 
 

@@ -127,7 +127,6 @@ float HueDial::angleFromMouse(const QPoint& pos)
     return angle;
 }
 
-
 void HueDial::mousePressEvent(QMouseEvent* event)
 {
     triangle.clear();
@@ -176,7 +175,6 @@ void HueDial::mousePressEvent(QMouseEvent* event)
 
         }
     }
-    //update();
 }
 
 void HueDial::mouseMoveEvent(QMouseEvent* event)
@@ -214,8 +212,8 @@ void HueDial::paintEvent(QPaintEvent* event)
     qreal windowSide = qMin(windowArea.width(), windowArea.height());
 
 
-    qreal knobRadius = windowSide * 0.028; //change to 0.035 if i manage to sort the weird offset
-    qreal knobDistance = windowSide / 2.135 - windowSide * 0.008; //remove subtraction
+    qreal knobRadius = windowSide * 0.028;
+    qreal knobDistance = windowSide / 2.135 - windowSide * 0.008;
 
     QPointF center = rect().center();
     p.setPen(QPen(Qt::white, 2));

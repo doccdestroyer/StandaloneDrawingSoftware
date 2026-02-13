@@ -17,7 +17,6 @@ signals:
     void redoPressed();
     void clearPressed();
 
-    //void selectAllPressed();
     void clearSelectionPressed();
     void expandSelectionsPressed();
     void contractSelectionsPressed();

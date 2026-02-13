@@ -10,14 +10,10 @@
 BucketTool::BucketTool(UIManager* ui, QWidget* parent)
     : QWidget(parent), uiManager(ui)
 {
-    //setWindowTitle("Bad Apple");
-    //setFixedSize(1920, 1080);
-    //setStyleSheet("background-color: rgb(30,30,30);");
     setAttribute(Qt::WA_TabletTracking);
     setAttribute(Qt::WA_MouseTracking);
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
-
 
     pngBackground = QImage(QDir::currentPath() + "/Images/PNGBackground.png");
 
@@ -26,12 +22,6 @@ BucketTool::BucketTool(UIManager* ui, QWidget* parent)
     image.fill(Qt::transparent);
     originalImage = image;
     background.fill(Qt::white);
-    //layers = { background, image };
-
-    //brush = QImage(QDir::currentPath() + "/Images/ChalkRot.png");
-
-    //brushOutline = QImage(QDir::currentPath() + "/Images/ChalkRot_Outline.png");
-    //uiManager = new UIManager(this);
 
     colourWindow = ui->colourWindow;
     uiManager = ui;
@@ -40,7 +30,6 @@ BucketTool::BucketTool(UIManager* ui, QWidget* parent)
     layers = layerManager->layers;
 
     overlay = layerManager->selectionOverlay;
-
 
     connect(colourWindow, &ColourWindow::colourChanged,
         this, [=](QColor newColor)
@@ -57,52 +46,9 @@ BucketTool::BucketTool(UIManager* ui, QWidget* parent)
 
     connect(layerManager, &LayerManager::layerAdded,
         this, [=](int layerIndex) {
-
-            //layers.insert(layerIndex, originalImage);
             selectedLayerIndex = layerIndex;
-            //layerManager->update();
-
-            //uiManager->undoManager->selectionOverlay = overlay;
-            //uiManager->undoManager->selectionsPath = selectionsPath;
-            //uiManager->undoManager->pushUndo(layers);
-
-
-            //uiManager->undoManager->redoSelectionStack.clear();
-            //uiManager->undoManager->redoLayerStack.clear();
-            //uiManager->undoManager->redoSelectionPathStack.clear();
-
             update();
         });
-
-
-    //connect(layerManager, &LayerManager::layerDeleted,
-    //    this, [=](int layerIndex) {
-    //        if (layerIndex < 0 || layerIndex >= layers.size()) {
-    //            return;
-    //        }
-    //
-    //        layers.removeAt(layerIndex);
-    //        //pushUndo(layers);
-    //
-    //        if (layers.count() == 0) {
-    //            selectedLayerIndex = 0;
-    //        }
-
-    //        uiManager->undoManager->selectionOverlay = overlay;
-    //        uiManager->undoManager->selectionsPath = selectionsPath;
-    //        uiManager->undoManager->pushUndo(layers);
-
-
-    //        uiManager->undoManager->redoSelectionStack.clear();
-    //        uiManager->undoManager->redoLayerStack.clear();
-    //        uiManager->undoManager->redoSelectionPathStack.clear();
-
-    //        layerManager->update();
-    //        update();
-    //    });
-
-
-
 }
 
 
@@ -115,10 +61,7 @@ void BucketTool::applyZoom(float zoomAmount)
     }
     else if (zoomPercentage < 1) { zoomPercentage = 1; }
     else { zoomPercentage = 12800; }
-    //QPointF hoverFromCenter = rect().center() + hoverPoint;
-    repaint();
     update();
-
 }
 
 void BucketTool::zoomIn()
@@ -215,7 +158,6 @@ void BucketTool::paintEvent(QPaintEvent* event)
 
     QPainter painter(this);
     QPoint center = rect().center();
-    //QPoint hoverOffset = center - hoverPoint.toPoint();
 
     painter.translate(center);
     painter.scale(zoomPercentage / 100, zoomPercentage / 100);
@@ -240,8 +182,6 @@ QPoint BucketTool::mapToImage(const QPoint& p)
     QPoint center = rect().center();
     qDebug() << center;
     QPoint offsetPoint = (p - center - panOffset) / (zoomPercentage / 100.0);
-    //QPoint offsetPoint = (p / (zoomPercentage / 100.0) - center - panOffset / (zoomPercentage / 100.0));
-
     return offsetPoint + QPoint(image.width() / 2.0, image.height() / 2.0);
 }
 
@@ -249,8 +189,6 @@ QPointF BucketTool::mapToImageF(const QPointF& p)
 {
     QPointF center = rect().center();
     QPointF offsetPoint = (p - center - panOffset) / (zoomPercentage / 100.0);
-    //QPoint offsetPoint = (p / (zoomPercentage / 100.0) - center - panOffset / (zoomPercentage / 100.0)).toPoint();
-
     return offsetPoint + QPointF(image.width() / 2.0, image.height() / 2.0);
 }
 
@@ -281,9 +219,9 @@ void BucketTool::mousePressEvent(QMouseEvent* event)
 
                     QPainterPath& path = newPath[i];
                     QPainterPath subtractionPath = imagePath.subtracted(path);
-                    newPath[i] = subtractionPath;
+                    //newPath[i] = subtractionPath;
 
-                    //newPath[i] = (subtractionPath != path) ? subtractionPath : path;
+                    newPath[i] = (subtractionPath != path) ? subtractionPath : path;
                     changed = (subtractionPath != path);
                     changed = true;
                     while (changed)
@@ -333,7 +271,6 @@ void BucketTool::mousePressEvent(QMouseEvent* event)
     layerManager->layers = layers;
     layerManager->update();
     uiManager->undoManager->pushUndo(layers);
-
     uiManager->undoManager->selectionsPath = selectionsPath;
 
     uiManager->undoManager->redoLayerStack.clear();
@@ -341,7 +278,6 @@ void BucketTool::mousePressEvent(QMouseEvent* event)
     uiManager->undoManager->redoSelectionStack.clear();
 
     update();
-
 }
 void BucketTool::mouseMoveEvent(QMouseEvent* event)
 {
@@ -376,7 +312,6 @@ QImage BucketTool::fill(QImage& image, int startX, int startY,
     QStack<QPoint> stack;
     stack.push(QPoint(startX, startY));
 
-
     while (!stack.isEmpty())
     {
         QPoint p = stack.pop();
@@ -385,11 +320,14 @@ QImage BucketTool::fill(QImage& image, int startX, int startY,
 
         if (x < 0 || x >= image.width() ||
             y < 0 || y >= image.height())
+        {
             continue;
+        }
 
         if (image.pixel(x, y) != target)
+        {
             continue;
-
+        }
 
         if (selectionsPath.length() > 0)
         {

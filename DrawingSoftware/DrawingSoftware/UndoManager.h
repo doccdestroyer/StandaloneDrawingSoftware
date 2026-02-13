@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 
 #include <LayerManager.h>
 
@@ -36,4 +35,3 @@ private:
 	QImage originalImage;
 	QVector<QImage> layers;
 };
-

@@ -107,10 +107,8 @@ void ToolSelectionMenu::createToolBar()
         border: 2px solid #2962ff;
         border-radius: 4px;
     }
-)");
+	)");
 	brushAction->setChecked(true);
-
-
 }
 
 void ToolSelectionMenu::disableTool()
@@ -208,6 +206,3 @@ void ToolSelectionMenu::enableEraserTool()
 	selectedTool = "Eraser";
 
 }
-
-
-

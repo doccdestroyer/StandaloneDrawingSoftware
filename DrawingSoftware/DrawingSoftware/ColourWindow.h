@@ -16,12 +16,10 @@ public:
     ColourWindow(QWidget* parent = nullptr);
 
     int dialAngle;
-
     int hueAngle();
+    QColor currentColour;
 
     QColor updateColour();
-
-    QColor currentColour;
 
     bool hueOnlyUpdated;
 
@@ -31,7 +29,6 @@ signals:
 protected:
     void resizeEvent(QResizeEvent* event) override;
     void createWheel();
-    //void mousePressEvent(QMouseEvent* event) override;
 
     void paintEvent(QPaintEvent*) override;
 
@@ -42,5 +39,3 @@ private:
     float saturation = 255.0f;
     float lightness = 255.0f;
 };
-
-

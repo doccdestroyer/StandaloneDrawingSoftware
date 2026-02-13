@@ -29,14 +29,8 @@ public:
     LayerManager* layerManager;
     ColourWindow* colourWindow;
 
-    //UIManager* uiManager;
 
-    bool isErasing = false;
-
-
-    /// ////////////////
     void ReturnColour(UIManager& ui);
-
 
     QVector<QImage> layers;
     QImage overlay;
@@ -45,9 +39,8 @@ public:
     QPoint panOffset;
     QVector<QPainterPath> selectionsPath;
 
-    //signals:
     qreal  opacity = 1.0;
-
+    bool isErasing = false;
     bool pressureAffectsSize = true;
     bool pressureAffectsOpacity = false;
     bool tiltEnabled = true;
@@ -55,13 +48,9 @@ public:
     int brushSize = 50;
     qreal spacing = 0;
 
-
-
     QImage brush;
-
     QImage brushOutline;
     std::string brushType;
-    //private slots:
 
 protected:
     void tabletEvent(QTabletEvent* event) override;
@@ -82,11 +71,6 @@ signals:
     void lassoEnabled();
     void bucketEnabled();
 
-
-
-private slots:
-    //void changeToLasso();
-
 private:
 
     UIManager* uiManager;
@@ -104,16 +88,12 @@ private:
     QPointF hoverPoint;
     QPointF pan;
 
-    //LayerManager* layerManager;
-
     qreal xTilt;
     qreal yTilt;
     bool drawing = false;
     bool usingTablet = false;
     bool isDrawing = false;
     int delayCounter;
-
-
 
     QColor colour = QColor(Qt::red);
 
@@ -125,13 +105,8 @@ private:
     QImage originalImage;
     QImage selectedImage;
 
-
-
     QStack<QVector<QImage>> undoStack;
     QStack<QVector<QImage>> redoStack;
-
-
-
 
     void removeLayer(int layer);
     void pushUndo(const QVector<QImage>& layers);
@@ -142,7 +117,3 @@ private:
     void drawBrush(QPainter& p, const QPointF& pos, qreal pressure);
     QImage adjustBrushColour(const QImage& brush, const QColor& color);
 };
-
-
-
-

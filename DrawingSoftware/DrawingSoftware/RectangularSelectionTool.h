@@ -1,10 +1,7 @@
 #pragma once
 
-
 #include <QWidget>
-//#include <QStack>
 #include <QImage>
-//#include <QVector>
 #include <QDir>
 
 #include <QMouseEvent>
@@ -97,4 +94,3 @@ private:
 
     bool panningEnabled;
 };
-

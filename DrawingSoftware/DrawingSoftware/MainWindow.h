@@ -30,11 +30,8 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow();
-    void keyPressEvent(QKeyEvent* event);
-    int TESTVARIABLE = 69;
     QDockWidget* dock;
     QDockWidget* TopDock;
-
 
 private:
 
@@ -86,4 +83,3 @@ private:
 
     QWidget currentTool;
 };
-

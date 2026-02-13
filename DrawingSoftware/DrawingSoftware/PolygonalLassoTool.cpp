@@ -44,8 +44,6 @@ PolygonalLassoTool::PolygonalLassoTool(UIManager* ui, QWidget* parent)
     pointsUndoStack.push(points);
     makingRemovalUndoStack.push(makingRemoval);
     makingAdditionalSelectionUndoStack.push(makingAdditionalSelection);
-
-
 }
 
 void PolygonalLassoTool::zoomIn()
@@ -211,8 +209,6 @@ QPainterPath PolygonalLassoTool::mapPointsOfPolygon(QPolygonF polygon, int numbe
 
 void PolygonalLassoTool::mousePressEvent(QMouseEvent* event)
 {
-    //selectionsPath = layerManager->selectionsPath;
-
     if (event->button() == Qt::LeftButton)
     {
         if (panningEnabled)
@@ -266,7 +262,6 @@ void PolygonalLassoTool::mousePressEvent(QMouseEvent* event)
 
                     }
                     selection.append(QPolygon(points));
-                    //pointsUndoStack.push(points);
                     QPolygonF newPolygon = QPolygonF(QPolygon(points));
                     QPainterPath polygonPath;
                     polygonPath.addPolygon(newPolygon);
@@ -360,27 +355,16 @@ void PolygonalLassoTool::mousePressEvent(QMouseEvent* event)
                                 {
                                     selectionsPath.append(newPath);
                                 }
-                                //clearSelectionOverlay();
                             }
                         }
-                        //////////////////////////////////////
+
 
                     }
-
-                    //clearSelectionOverlay();
-                    //pointsUndoStack.push(points);
-
                     points.clear();
-                    //updateSelectionOverlay();
-
                 }
                 else
                 {
-
                     points.append(point);
-                    //pointsUndoStack.push(points);
-
-                    //updateSelectionOverlay();
 
                 }
             }
@@ -393,11 +377,7 @@ void PolygonalLassoTool::mousePressEvent(QMouseEvent* event)
             makingRemovalUndoStack.push(makingRemoval);
             makingAdditionalSelectionUndoStack.push(makingAdditionalSelection);
 
-            //uiManager->undoManager->selectionOverlay = overlay;
-            //uiManager->undoManager->selectionsPath = selectionsPath;
-            //updateSelectionOverlay();
             layerManager->update();
-            //updateSelectionOverlay();
 
         }
         updateSelectionOverlay();
@@ -413,7 +393,6 @@ void PolygonalLassoTool::mousePressEvent(QMouseEvent* event)
 
 void PolygonalLassoTool::mouseMoveEvent(QMouseEvent* event)
 {
-    //if (!(event->buttons() & Qt::LeftButton)) return;
     if (isPanning && event->button() == Qt::LeftButton)
     {
         if (!lastPanPoint.isNull())
@@ -446,7 +425,6 @@ void PolygonalLassoTool::mouseReleaseEvent(QMouseEvent* event)
 void PolygonalLassoTool::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
-    //QPoint hoverOffset = center - hoverPoint.toPoint();
 
     QPoint center = rect().center();
 
@@ -476,23 +454,15 @@ void PolygonalLassoTool::clearSelectionOverlay()
 
 void PolygonalLassoTool::updateSelectionOverlay()
 {
-
     overlay.fill(Qt::transparent);
     QPainter painter(&overlay);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-    //QPainter painter(This);
     QPoint center = image.rect().center();
-    //QPoint hoverOffset = center - hoverPoint.toPoint();
-
-    //painter.translate(center);
-    //painter.scale(zoomPercentage / 100, zoomPercentage / 100);
-    //painter.translate(panOffset / (zoomPercentage / 100.0));
 
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
-    //QPointF topLeft(-image.width() / 2.0, -image.height() / 2.0);
     QPointF topLeft(center);
 
 
@@ -521,13 +491,10 @@ void PolygonalLassoTool::updateSelectionOverlay()
 
     }
     if (!hoverPoint.isNull() && points.count() > 0 && !isComplete && isDrawing && !isFirstClick)
-
-    //if (isDrawing && !hoverPoint.isNull() && points.count() > 0 && !isComplete)
     {
         painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
         painter.drawLine(points[points.count()-1], hoverPoint);
     }
-
     update();
 }
 

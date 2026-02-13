@@ -5,7 +5,6 @@
 #include <UndoManager.h>
 #include <MenuBar.h>
 
-
 class UIManager : public QWidget
 {
     Q_OBJECT
@@ -16,4 +15,3 @@ public:
     UndoManager* undoManager;
     MenuBar* menuBar;
 };
-

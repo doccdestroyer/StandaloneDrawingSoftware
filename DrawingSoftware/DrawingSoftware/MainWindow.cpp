@@ -9,23 +9,6 @@ MainWindow::MainWindow()
     setAttribute(Qt::WA_TabletTracking);
     setAttribute(Qt::WA_MouseTracking);
     setMouseTracking(true);
-
-    //setFocusPolicy(Qt::StrongFocus);
-
-
-    //pngBackground = QImage(QDir::currentPath() + "/Images/PNGBackground.png");
-
-    //background = QImage(1100, 1100, QImage::Format_ARGB32_Premultiplied);
-    //image = background;
-    //image.fill(Qt::transparent);
-    //originalImage = image;
-    //background.fill(Qt::white);
-    //layers = { background, image };
-
-    //undoStack.push(layers);
-    //brush = QImage(QDir::currentPath() + "/Images/ChalkRot.png");
-
-    //brushOutline = QImage(QDir::currentPath() + "/Images/ChalkRot_Outline.png");
     uiManager = new UIManager(this);
 
     brushTool = new BrushTool(uiManager, this);
@@ -36,22 +19,12 @@ MainWindow::MainWindow()
     ellipticalSelectionTool = new EllipticalSelectionTool(uiManager, this);
 
     toolSelectionMenu = new ToolSelectionMenu(this);
-
     menuBar = uiManager->menuBar;
-
-
-
     colourWindow = uiManager->colourWindow;
-    //colourWindow = brushTool->colourWindow;
-    //colourWindow->show();
-
-    layerManager = brushTool->layerManager;
-    //layerManager->show();
-
-    //toolSelectionMenu->show();
-    createDockWindows();
-
     brushControlsWindow = new BrushControlsWindow(this);
+    layerManager = brushTool->layerManager;
+
+    createDockWindows();
 
     connect(menuBar, &MenuBar::undoPressed,
         this, [&]()
@@ -90,21 +63,6 @@ MainWindow::MainWindow()
         {
             expandSelections();
         });
-
-    //connect(menuBar, &MenuBar::selectAllPressed,
-    //    this, [&]()
-    //    {
-    //        clearOverlay();
-    //        layerManager->selectionOverlay.fill(Qt::transparent);
-    //        layerManager->selectionsPath.clear();
-
-    //        QVector<QPainterPath> newPath = {QPainterPath()};
-    //        newPath[0].addRect(layerManager->image.rect());
-    //        layerManager->selectionsPath = newPath;
-    //        updateOverlay();
-    //        updateTool();
-
-    //    });
 
 
     connect(brushControlsWindow, &BrushControlsWindow::chalkEnabled,
@@ -395,7 +353,6 @@ void MainWindow::disableEllipticalSelectionTool()
 
 void MainWindow::disableEraser()
 {
-    //disableBrushTool();
     layerManager->updateLayers(brushTool->layers,
         brushTool->overlay,
         brushTool->zoomPercentage,
@@ -438,8 +395,6 @@ void MainWindow::enablePolygonalLassoTool()
     polygonalLassoTool->panOffset = layerManager->panOffset;
     polygonalLassoTool->selectionsPath = layerManager->selectionsPath;
     polygonalLassoTool->overlay = layerManager->selectionOverlay;
-
-    //polygonalLassoTool->updateSelectionOverlay();
 }
 
 
@@ -478,81 +433,6 @@ void MainWindow::enableEraser()
     enableBrushTool();
     brushTool->isErasing = true;
 }
-void MainWindow::keyPressEvent(QKeyEvent* event)
-{
-    //if (event->key() == 61 && event->modifiers() & Qt::ControlModifier)
-    //    brushTool->zoomIn();
-    //if (event->key() == 45 && event->modifiers() & Qt::ControlModifier)
-    //    brushTool->zoomOut();
-
-    //if (event->key() == Qt::Key_0 && event->modifiers() & Qt::ControlModifier)
-    //    brushTool->resetZoom();
-
-    //if (event->key() == Qt::Key_Z && event->modifiers() & Qt::ControlModifier)
-    //    brushTool->undo();
-    //layerManager->undo();
-    //if (event->key() == Qt::Key_Y && event->modifiers() & Qt::ControlModifier)
-    //    brushTool->redo();
-    //layerManager->redo();
-
-    //if (event->key() == Qt::Key_Space)
-    //{
-    //    //panningEnabled = true;
-    //    setCursor(Qt::OpenHandCursor);
-    //}
-
-    //if (event->key() == Qt::Key_E)
-    //{
-    //    /*  if (isErasing == true) {
-    //          isErasing = false;
-    //          colour = colourWindow->updateColour();
-    //      }
-    //      else {
-
-    //          isErasing = true;
-    //      }*/
-    //}
-    //if (event->key() == Qt::Key_L)
-    //{
-    //    layerManager->updateLayers(brushTool->layers, brushTool -> overlay);
-    //    dock->setWidget(lassoTool);
-    //    lassoTool->layers = layerManager->layers;
-    //    lassoTool->overlay = layerManager->selectionOverlay;
-
-
-    //}
-    //if (event->key() == Qt::Key_B)
-    //{
-    //    layerManager->updateLayers(lassoTool->layers, lassoTool->overlay);
-    //    dock->setWidget(brushTool);
-    //    brushTool->layers = layerManager->layers;
-    //    brushTool->overlay = layerManager->selectionOverlay;
-
-    //    //if (brushType == "chalk") {
-
-    //    //    brush = QImage(QDir::currentPath() + "/Images/CircleBrush.png");
-    //    //    brushOutline = QImage(QDir::currentPath() + "/Images/CircleBrush_Outline.png");
-    //    //    brushType = "circle";
-    //    //}
-    //    //else {
-    //    //    brush = QImage(QDir::currentPath() + "/Images/ChalkRot.png");
-    //    //    brushTool->brushOutline = QImage(QDir::currentPath() + "/Images/ChalkRot_Outline.png");
-    //    //    brushType = "chalk";
-
-    //    //}
-    //}
-
-    //if (event->key() == 91)
-    //{
-    //    //alterBrushSize(-1);
-    //}
-
-    //if (event->key() == 93)
-    //{
-    //    //alterBrushSize(1);
-    //}
-
-}
 
 void MainWindow::createDockWindows()
 {
@@ -562,44 +442,29 @@ void MainWindow::createDockWindows()
 
     dock = new QDockWidget(tr("Colour Window"), this);
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-   
-
 
     TopDock->setWidget(menuBar);
     addDockWidget(Qt::TopDockWidgetArea, TopDock);
 
-
     splitDockWidget(TopDock, dock, Qt::Vertical);
 
-
-    //dock = new QDockWidget(tr("Colour Window"), this);
     colourWindow->setFixedSize(300, 300);
     dock->setWidget(colourWindow);
     addDockWidget(Qt::RightDockWidgetArea, dock);
-
-
 
     dock = new QDockWidget(tr("Layers"), this);
     dock->setWidget(layerManager);
     addDockWidget(Qt::RightDockWidgetArea, dock);
 
-    //QWidget* centralWidget = new QWidget();
-    //QHBoxLayout* layout = new QHBoxLayout(centralWidget);
-
     QDockWidget* ToolDock = new QDockWidget(tr("Tools"), this);
     ToolDock->setWidget(toolSelectionMenu);
     addDockWidget(Qt::LeftDockWidgetArea, ToolDock);
-    //layout->addWidget(toolSelectionMenu);
 
     dock = new QDockWidget(tr("WindowFileName"), this);
     dock->setWidget(brushTool);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
-    //layout->addWidget(brushTool);
-    //dock->setLayout(layout);
 
     splitDockWidget(ToolDock, dock, Qt::Horizontal);
-    //addDockWidget(Qt::LeftDockWidgetArea, dock);
-
 }
 
 void MainWindow::alterSelectionsScale(float scaleFactor)
@@ -678,9 +543,6 @@ void MainWindow::toolSpecificUndo()
     updateOverlay();
     updateTool();
     updateAllTools();
-/*    updateTool();
-    updateOverlay();
-    updateTool()*/;
 }
 
 void MainWindow::toolSpecificRedo()

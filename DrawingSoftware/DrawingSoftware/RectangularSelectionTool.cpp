@@ -285,22 +285,6 @@ void RectangularSelectionTool::mouseReleaseEvent(QMouseEvent* event)
             QPainterPath newPath;
             newPath.addPolygon(newPolygonF);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             if (makingRemoval)
             {
                 bool removedFromMerge = false;
@@ -366,7 +350,8 @@ void RectangularSelectionTool::mouseReleaseEvent(QMouseEvent* event)
                                 if (selectionsPath[i].intersects(otherPath))
                                 {
                                     selectionsPath[i] = selectionsPath[i].united(otherPath);
-                                    selectionsPath.erase(selectionsPath.begin() + j);                                    changed = true;
+                                    selectionsPath.erase(selectionsPath.begin() + j);
+                                    changed = true;
                                     break;
                                 }
 
@@ -389,105 +374,7 @@ void RectangularSelectionTool::mouseReleaseEvent(QMouseEvent* event)
             }
         }
 
-        }
-
-
-
-
-
-
-
-
-    //    if (makingRemoval)
-    //    {
-    //        bool removedFromMerge = false;
-
-
-    //        for (int i = 0; i < selectionsPath.length(); ++i)
-    //        {
-    //            QPainterPath& path = selectionsPath[i];
-    //            if (path.intersects(newPath))
-    //            {
-    //                QPainterPath subtractionPath = path.subtracted(newPath);
-    //                selectionsPath[i] = subtractionPath;
-    //                removedFromMerge = true;
-    //                bool changed = true;
-    //                while (changed)
-    //                {
-    //                    changed = false;
-    //                    for (int k = 0; k < selectionsPath.length(); ++k)
-    //                    {
-    //                        QPainterPath& otherPath = selectionsPath[k];
-    //                        if (i == k) continue;
-
-    //                        if (selectionsPath[i].intersects(otherPath))
-    //                        {
-    //                            selectionsPath[i] = selectionsPath[i].subtracted(otherPath);
-    //                            selectionsPath.erase(selectionsPath.begin() + k);
-    //                            changed = true;
-    //                            break;
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //            if (!removedFromMerge)
-    //            {
-    //                selectionsPath.append(newPath);
-    //            }
-
-    //        }
-
-    //    }
-    //    else if (makingAdditionalSelection)
-    //    {
-    //        bool mergedAnyPolygons = false;
-    //        for (int i = 0; i < selectionsPath.length(); ++i)
-    //        {
-    //            QPainterPath& path = selectionsPath[i];
-
-    //            if (path.intersects(newPath)) {
-    //                QPainterPath mergedPath = path.united(newPath);
-    //                selectionsPath[i] = mergedPath;
-
-    //                mergedAnyPolygons = true;
-    //                bool changed = true;
-
-    //                while (changed)
-    //                {
-    //                    changed = true;
-    //                    for (int j = 0; j < selectionsPath.length(); ++j)
-    //                    {
-    //                        QPainterPath& otherPath = selectionsPath[j];
-    //                        if (j == i) continue;
-
-    //                        if (selectionsPath[i].intersects(otherPath))
-    //                        {
-    //                            selectionsPath[i] = selectionsPath[i].united(otherPath);
-    //                            selectionsPath.erase(selectionsPath.begin() + j);                                    changed = true;
-    //                            break;
-    //                        }
-
-    //                    }
-    //                    break;
-    //                }
-    //            }
-    //            if (!mergedAnyPolygons)
-    //            {
-    //                selectionsPath.append(newPath);
-    //            }
-    //        }
-    //    }
-    //    else
-    //    {
-    //        {
-    //            selectionsPath.clear();
-    //            selectionsPath.append(newPath);
-    //        }
-    //    }
-// 
-    //}
-    ////points.clear();
-
+    }
     updateSelectionOverlay();
     update();
     uiManager->undoManager->selectionOverlay = overlay;
@@ -538,20 +425,12 @@ void RectangularSelectionTool::updateSelectionOverlay()
     QPainter painter(&overlay);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-    //QPainter painter(This);
     QPoint center = image.rect().center();
-    //QPoint hoverOffset = center - hoverPoint.toPoint();
-
-    //painter.translate(center);
-    //painter.scale(zoomPercentage / 100, zoomPercentage / 100);
-    //painter.translate(panOffset / (zoomPercentage / 100.0));
 
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
-    //QPointF topLeft(-image.width() / 2.0, -image.height() / 2.0);
     QPointF topLeft(center);
-
 
     QPen outlinePen = QPen(Qt::red, 1);
     QBrush fillBrush = QBrush(QColor(255, 0, 0, 50));
@@ -572,13 +451,11 @@ void RectangularSelectionTool::updateSelectionOverlay()
             painter.drawPolygon(polyQ);
         }
     }
-
     QPen hoverPen = QPen(Qt::red, 1, Qt::DashLine);
     QBrush hoverBrush = QBrush(QColor(Qt::transparent));
 
     painter.setPen(hoverPen);
     painter.setBrush(hoverBrush);
-
 
     if (startPoint != QPoint(0, 0) && hoverPoint != QPoint(0, 0) && isDrawing)
     {

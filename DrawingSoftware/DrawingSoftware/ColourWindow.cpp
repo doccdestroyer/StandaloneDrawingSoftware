@@ -26,11 +26,8 @@ int ColourWindow::hueAngle()
     dialAngle = dial->value();
     update();
     dial->update();
-
     currentColour = updateColour();
-
     emit colourChanged(currentColour);
-
     return dial->value();
 }
 
@@ -42,9 +39,7 @@ QColor ColourWindow::updateColour()
     
     QColor newColor = QColor::fromHsl(360 - dialAngle, int(saturation * 255), int(lightness * 255));
     currentColour = newColor;
-
     emit colourChanged(currentColour);
-
     return QColor::fromHsl(360 - dialAngle, int(saturation * 255), int(lightness * 255));
 }
 
@@ -60,15 +55,6 @@ void ColourWindow::createWheel()
     dial->setGeometry(0, 0, 300, 300);
     int angle = dial->value();
 }
-
-//void ColourWindow::mousePressEvent(QMouseEvent* event)
-//{
-//    QPointF clickPosition = QPointF(event->pos());
-//    if (windowArea.contains(clickPosition)) {
-//    }
-//    else {
-//    }
-//}
 
 void ColourWindow::paintEvent(QPaintEvent*)
 {
@@ -159,8 +145,4 @@ void ColourWindow::paintEvent(QPaintEvent*)
     painter.rotate(-22.5);
     painter.drawImage(QPointF(-triImg.width() / 2.0, -triImg.height() / 2.0), triImg);
     painter.restore();
-
-
 }
-
-

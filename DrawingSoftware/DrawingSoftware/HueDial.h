@@ -8,11 +8,7 @@
 
 
 class HueDial : public QDial
-
 {
-
-    //signals:
-    //    void colorDialAngle(float angle);
     Q_OBJECT
 public:
     HueDial(QWidget* parent = nullptr);
@@ -57,13 +53,8 @@ protected:
         float& w1, float& w2, float& w3);
 
     float angleFromMouse(const QPoint& pos);
-
     void mousePressEvent(QMouseEvent* event);
-
     void mouseMoveEvent(QMouseEvent* event);
-
     void mouseReleaseEvent(QMouseEvent* event) override;
-
     void paintEvent(QPaintEvent* event) override;
 };
-
